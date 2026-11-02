@@ -94,5 +94,9 @@ Closing the browser tab leaves the desktop running.
 Browser audio is enabled in the image. If playback is silent, enable audio in
 the web interface and select PulseAudio under Praat's Sound playing preferences.
 Browser microphone recording is not provided by this setup.
+
+Galaxy currently only supports .wav and .TextGrid files as input files. Output
+is also limited to .TextGrid files. It is also not yet possible to run Praat
+scripts in the interactive tool.
     ]]></help>
 </tool>
