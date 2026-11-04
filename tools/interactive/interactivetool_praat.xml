@@ -2,7 +2,7 @@
     <description>interactive speech analysis and annotation</description>
     <icon src="praat.png"/>
     <macros>
-        <token name="@VERSION@">7.0.02</token>
+        <token name="@VERSION@">7.0.02-1</token>
     </macros>
     <requirements>
         <container type="docker">quay.io/galaxy/praat-headless:@VERSION@</container>
@@ -12,55 +12,25 @@
             <port>5800</port>
         </entry_point>
     </entry_points>
-    <command detect_errors="exit_code"><![CDATA[
+<command detect_errors="exit_code"><![CDATA[
+        mkdir -p "\$PWD/praat_workspace/inputs" "\$PWD/praat_workspace/outputs" &&
+        ln -s "\$PWD/praat_workspace" /workspace &&
 
-        export HOME=/config &&
-        GALAXY_WORKDIR="\$PWD" &&
-        mkdir -p ./inputs ./outputs &&
-        chown 1000:1000 ./inputs || true && ## the app user of the container (in NFS export with root-shash this will fail and is not needed)
-        chown 1000:1000 ./outputs || true && ## the app user of the container (in NFS export with root-shash this will fail and is not needed)
-        echo "=== Process identity ===" &&
-        echo "User ID: " &&
-        id -u &&
-        echo "Group ID: " &&
-        id -g &&
-        echo "=== Galaxy working directory ===" &&
-        echo "\$GALAXY_WORKDIR" &&
+        ## Tell the container's startup script where to find the Praat workspace.
+        export PRAAT_WORKDIR=/workspace &&
 
-        mkdir -p "\$GALAXY_WORKDIR/inputs" "\$GALAXY_WORKDIR/outputs" &&
+        #from os.path import splitext
+        #from re import sub
+        #for $i, $dataset in enumerate($datasets)
+            #set $stem = sub(r'[^A-Za-z0-9._-]+', '_', splitext(str($dataset.name))[0]).strip('._') or 'sanitized_name_empty'
+            #set $filename = "input_%s_%s_galaxy_hid_%s.%s" % ($i, $stem, $dataset.hid, $dataset.ext)
 
-        if [ "\$GALAXY_WORKDIR" != "/config" ]; then
-            if [ -e /config/outputs ] || [ -L /config/outputs ]; then
-                echo "ERROR: /config/outputs already exists" >&2;
-                exit 1;
-            fi;
-            ln -s "\$GALAXY_WORKDIR/outputs" /config/outputs;
-        fi &&
+            printf 'Copying Galaxy dataset into inputs directory as %s\n' '${filename}';
+            cp '$dataset' "\$PRAAT_WORKDIR/inputs/${filename}";
+        #end for
 
-        echo "=== Current directory ===" &&
-        pwd &&
-
-        echo "=== Directory permissions ===" &&
-        ls -ld / /config ./inputs ./outputs &&
-        echo "=== Directory contents ===" &&
-        ls -l ./inputs &&
-        ls -l ./outputs &&
-        ls -l /config &&
-
-        #if $datasets
-            #for $i, $dataset in enumerate($datasets)
-                cp '$dataset' '/config/dataset_${i}.${dataset.ext}' &&
-            #end for
-        #end if
-        ls -l ./inputs &&
-
-        echo "=== Starting /init with debugging ===" &&
-        /bin/sh -x /init 2>&1
-
-        rc=\$?
-        echo "=== /init exited with code: \$rc ==="
-        exit "\$rc"
-        praat --version > version.txt &&
+        ## Make only the outputs directory writable by Praat.
+        chown --reference="\$PWD" "\$PRAAT_WORKDIR/outputs" &&
         /init
     ]]></command>
     <inputs>
@@ -73,7 +43,7 @@
         <collection name="outputs" type="list" label="Praat outputs">
             <discover_datasets
             pattern="(?P&lt;name&gt;.+)\.TextGrid"
-            directory="outputs"
+            directory="praat_workspace/outputs"
             format="textgrid"
             visible="true" />
         </collection>
@@ -88,7 +58,6 @@ They have numbered filenames; your original Galaxy datasets are not modified.
 Save results directly in the outputs directory, then close Praat by clicking
 on the red square under Praat in the Interactive Tools panel.
 The container finishes and Galaxy collects the saved files into a collection.
-Saving an input file in inputs does not include it in the output collection.
 Closing the browser tab leaves the desktop running.
 
 Browser audio is enabled in the image. If playback is silent, enable audio in
