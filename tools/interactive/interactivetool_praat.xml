@@ -61,18 +61,19 @@ Launch this tool and open the desktop from Active Interactive Tools.
 Selected files are copied into the inputs directory and opened automatically.
 They have numbered filenames; your original Galaxy datasets are not modified.
 
-Save results directly in the outputs directory, then close Praat by clicking
-on the red square under Praat in the Interactive Tools panel.
-The container finishes and Galaxy collects the saved files into a collection.
+Ensure you save the results in the outputs directory, then close Praat via
+Praat -> Quit Praat in Praat before clicking on the red square under Praat in the
+Interactive Tools panel.The container finishes and Galaxy collects the saved
+files into a collection.
 Closing the browser tab leaves the desktop running.
 
 Browser audio is enabled in the image. If playback is silent, enable audio in
 the web interface and select PulseAudio under Praat's Sound playing preferences.
 Browser microphone recording is not provided by this setup.
 
-The Praat Galaxy interactivetool currently accepts only .wav and .TextGrid files as inputs. Output
-is also limited to .TextGrid files. It is also not yet possible to run Praat
-scripts in the interactive tool. The only permissible output is currently
-.TextGrid; praat.collections is not supported.
+The Praat Galaxy interactivetool currently accepts only .wav and .TextGrid
+files as inputs. Outputis also limited to .TextGrid files. It is also not yet
+possible to run Praat scripts in the interactive tool. The only permissible
+output is currently .TextGrid; praat.collections is not supported.
     ]]></help>
 </tool>
